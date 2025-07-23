@@ -135,8 +135,9 @@ export default function Home() {
             <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
               An operating system
               <br />
-              <span className="bg-gradient-to-r from-green-500 to-blue-500 bg-clip-text text-transparent">
-                for your life.
+              <span>
+                for{' '}
+                <span className="bg-gradient-to-r from-green-500 to-blue-500 bg-clip-text text-transparent">your life</span>.
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
