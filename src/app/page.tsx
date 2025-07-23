@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Tooltip } from 'react-tooltip';
 
 export default function Home() {
   const [showWaitlistModal, setShowWaitlistModal] = useState(false);
@@ -42,6 +44,182 @@ export default function Home() {
       }, 2000);
     }
   };
+
+  const personas = [
+    {
+      key: "your-life",
+      label: "Your Life",
+      icon: (active: boolean) => (
+        <svg className="w-8 h-8" fill="none" stroke={active ? "url(#your-life-gradient)" : "#94a3b8"} viewBox="0 0 24 24">
+          <defs>
+            <linearGradient id="your-life-gradient" x1="0" y1="0" x2="1" y2="1">
+              <stop stopColor="#22c55e" />
+              <stop offset="1" stopColor="#3b82f6" />
+            </linearGradient>
+          </defs>
+          <circle cx="12" cy="12" r="10" strokeWidth="2" />
+          <path d="M8 14s1.5 2 4 2 4-2 4-2" strokeWidth="2" />
+          <path d="M9 9h.01M15 9h.01" strokeWidth="2" />
+        </svg>
+      ),
+      headline: "An operating system for your life",
+      subtext: "A local-first, privacy-first dashboard that helps you manage everything in your life — notes, emails, files, tasks, calendars, and learning data — in one place.",
+      gradient: "from-green-500 to-blue-500",
+      stops: ["#22c55e", "#3b82f6"]
+    },
+    {
+      key: "managers",
+      label: "Managers",
+      icon: (active: boolean) => (
+        <svg className="w-8 h-8" fill="none" stroke={active ? "url(#managers-gradient)" : "#94a3b8"} viewBox="0 0 24 24">
+          <defs>
+            <linearGradient id="managers-gradient" x1="0" y1="0" x2="1" y2="1">
+              <stop stopColor="#6366f1" />
+              <stop offset="1" stopColor="#8b5cf6" />
+            </linearGradient>
+          </defs>
+          <circle cx="12" cy="7" r="4" strokeWidth="2" />
+          <path d="M5.5 21a6.5 6.5 0 0 1 13 0" strokeWidth="2" />
+        </svg>
+      ),
+      headline: "An operating system for managers",
+      subtext: "Manage teams, projects, and goals with clarity and ease.",
+      gradient: "from-blue-500 to-purple-500",
+      stops: ["#6366f1", "#8b5cf6"]
+    },
+    {
+      key: "developers",
+      label: "Developers",
+      icon: (active: boolean) => (
+        <svg className="w-8 h-8" fill="none" stroke={active ? "url(#developers-gradient)" : "#94a3b8"} viewBox="0 0 24 24">
+          <defs>
+            <linearGradient id="developers-gradient" x1="0" y1="0" x2="1" y2="1">
+              <stop stopColor="#4f46e5" />
+              <stop offset="1" stopColor="#6366f1" />
+            </linearGradient>
+          </defs>
+          <path d="M16 18l6-6-6-6" strokeWidth="2" />
+          <path d="M8 6l-6 6 6 6" strokeWidth="2" />
+        </svg>
+      ),
+      headline: "An operating system for developers",
+      subtext: "Organize code, tasks, and documentation in one powerful dashboard.",
+      gradient: "from-indigo-500 to-blue-500",
+      stops: ["#4f46e5", "#6366f1"]
+    },
+    {
+      key: "writers",
+      label: "Writers",
+      icon: (active: boolean, idx?: number) => {
+        const gradientId = `writers-gradient-btn-${idx}`;
+        return (
+          <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24">
+            <defs>
+              <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
+                <stop stopColor="#ec4899" />
+                <stop offset="1" stopColor="#f59e0b" />
+              </linearGradient>
+            </defs>
+            {/* Line always visible, solid color */}
+            <path d="M12 20h9" stroke={active ? "#ec4899" : "#94a3b8"} strokeWidth="2" />
+            {/* Pen uses gradient when active, gray when inactive */}
+            <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19.5 3 21l1.5-4L16.5 3.5z" stroke={active ? `url(#${gradientId})` : "#94a3b8"} strokeWidth="2" />
+          </svg>
+        );
+      },
+      headline: "An operating system for writers",
+      subtext: "Draft, edit, and track your writing projects with focus and flow.",
+      gradient: "from-pink-500 to-red-500",
+      stops: ["#ec4899", "#f59e0b"]
+    },
+    {
+      key: "students",
+      label: "Students",
+      icon: (active: boolean) => (
+        <svg className="w-8 h-8" fill="none" stroke={active ? "url(#students-gradient)" : "#94a3b8"} viewBox="0 0 24 24">
+          <defs>
+            <linearGradient id="students-gradient" x1="0" y1="0" x2="1" y2="1">
+              <stop stopColor="#10b981" />
+              <stop offset="1" stopColor="#3b82f6" />
+            </linearGradient>
+          </defs>
+          <path d="M12 3L2 9l10 6 10-6-10-6z" strokeWidth="2" />
+          <path d="M2 17l10 6 10-6" strokeWidth="2" />
+          <path d="M2 12l10 6 10-6" strokeWidth="2" />
+        </svg>
+      ),
+      headline: "An operating system for students",
+      subtext: "Stay on top of assignments, notes, and learning with smart tools.",
+      gradient: "from-green-400 to-teal-500",
+      stops: ["#10b981", "#3b82f6"]
+    },
+    {
+      key: "designers",
+      label: "Designers",
+      icon: (active: boolean) => (
+        <svg className="w-8 h-8" fill="none" stroke={active ? "url(#designers-gradient)" : "#94a3b8"} viewBox="0 0 24 24">
+          <defs>
+            <linearGradient id="designers-gradient" x1="0" y1="0" x2="1" y2="1">
+              <stop stopColor="#f59e0b" />
+              <stop offset="1" stopColor="#ef4444" />
+            </linearGradient>
+          </defs>
+          <circle cx="12" cy="12" r="10" strokeWidth="2" />
+          <circle cx="12" cy="12" r="4" strokeWidth="2" />
+        </svg>
+      ),
+      headline: "An operating system for designers",
+      subtext: "Collect inspiration, manage assets, and streamline your creative process.",
+      gradient: "from-yellow-400 to-pink-500",
+      stops: ["#f59e0b", "#ef4444"]
+    },
+    {
+      key: "founders",
+      label: "Founders",
+      icon: (active: boolean) => (
+        <svg className="w-8 h-8" fill="none" stroke={active ? "url(#founders-gradient)" : "#94a3b8"} viewBox="0 0 24 24">
+          <defs>
+            <linearGradient id="founders-gradient" x1="0" y1="0" x2="1" y2="1">
+              <stop stopColor="#f97316" />
+              <stop offset="1" stopColor="#d97706" />
+            </linearGradient>
+          </defs>
+          <path d="M12 2l2 7h7l-5.5 4 2 7-5.5-4-5.5 4 2-7L3 9h7z" strokeWidth="2" />
+        </svg>
+      ),
+      headline: "An operating system for founders",
+      subtext: "Juggle vision, tasks, and growth with a system built for entrepreneurship.",
+      gradient: "from-orange-500 to-yellow-500",
+      stops: ["#f97316", "#d97706"]
+    },
+    {
+      key: "everyone",
+      label: "Everyone",
+      icon: (active: boolean) => (
+        <svg className="w-8 h-8" fill="none" stroke={active ? "url(#everyone-gradient)" : "#94a3b8"} viewBox="0 0 24 24">
+          <defs>
+            <linearGradient id="everyone-gradient" x1="0" y1="0" x2="1" y2="1">
+              <stop stopColor="#4b5563" />
+              <stop offset="1" stopColor="#1f2937" />
+            </linearGradient>
+          </defs>
+          <circle cx="12" cy="12" r="10" strokeWidth="2" />
+          <path d="M8 14s1.5 2 4 2 4-2 4-2" strokeWidth="2" />
+          <path d="M9 9h.01M15 9h.01" strokeWidth="2" />
+        </svg>
+      ),
+      headline: "An operating system for everyone",
+      subtext: "A local-first, privacy-first dashboard for all your life's work.",
+      gradient: "from-gray-500 to-gray-900",
+      stops: ["#4b5563", "#1f2937"]
+    },
+  ];
+  const [personaIndex, setPersonaIndex] = useState(0); // default to 'your life'
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+  const handlePrev = () => setPersonaIndex((prev) => (prev - 1 + personas.length) % personas.length);
+  const handleNext = () => setPersonaIndex((prev) => (prev + 1) % personas.length);
+  const handleSelect = (idx: number) => setPersonaIndex(idx);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
@@ -132,17 +310,85 @@ export default function Home() {
       >
         <div className="container mx-auto px-6 text-center">
           <div className="max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
-              An operating system
-              <br />
-              <span>
-                for{' '}
-                <span className="bg-gradient-to-r from-green-500 to-blue-500 bg-clip-text text-transparent">your life.</span>
-              </span>
-            </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
-              A local-first, privacy-first dashboard that helps you manage everything in your life — notes, emails, files, tasks, calendars, and learning data — in one place.
-            </p>
+            {/* Persona Carousel */}
+            <motion.div className="flex flex-col items-center mb-8" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: 'easeOut' }}>
+              <div className="flex items-center gap-4 mb-4">
+                <motion.button
+                  aria-label="Previous persona"
+                  onClick={handlePrev}
+                  className="p-2 rounded-full hover:bg-gray-200 transition-colors"
+                  whileTap={{ scale: 0.85 }}
+                  whileHover={{ scale: 1.1 }}
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" strokeWidth="2"/></svg>
+                </motion.button>
+                <div className="flex gap-4">
+                  {personas.map((persona, idx) => {
+                    const isActive = hoveredIndex === idx || personaIndex === idx;
+                    return (
+                      <motion.button
+                        key={persona.key}
+                        onClick={() => handleSelect(idx)}
+                        className={`p-2 rounded-full border-2 transition-colors ${isActive ? 'border-blue-500 bg-blue-50' : 'border-transparent hover:bg-gray-100'}`}
+                        aria-label={persona.label}
+                        style={{ transition: 'background 0.3s' }}
+                        data-tooltip-id="persona-tooltip"
+                        data-tooltip-content={persona.label}
+                        onMouseEnter={() => setHoveredIndex(idx)}
+                        onMouseLeave={() => setHoveredIndex(null)}
+                        whileHover={{ scale: 1.15, boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)' }}
+                        whileTap={{ scale: 0.95 }}
+                        animate={isActive ? { scale: 1.18, boxShadow: '0 8px 32px 0 rgba(0,0,0,0.12)' } : { scale: 1, boxShadow: '0 0px 0px 0 rgba(0,0,0,0)' }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                      >
+                        {persona.key === 'writers' ? persona.icon(isActive, idx) : persona.icon(isActive)}
+                      </motion.button>
+                    );
+                  })}
+                </div>
+                <motion.button
+                  aria-label="Next persona"
+                  onClick={handleNext}
+                  className="p-2 rounded-full hover:bg-gray-200 transition-colors"
+                  whileTap={{ scale: 0.85 }}
+                  whileHover={{ scale: 1.1 }}
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" strokeWidth="2"/></svg>
+                </motion.button>
+              </div>
+            </motion.div>
+            <Tooltip id="persona-tooltip" place="top" className="!z-50 !text-xs !rounded-md !px-3 !py-1 !bg-black !text-white !shadow-lg" />
+            {/* Dynamic Hero Headline */}
+            <div className="relative">
+              <AnimatePresence mode="wait">
+                <motion.h1
+                  key={personaIndex}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -30 }}
+                  transition={{ duration: 0.5, ease: 'easeOut' }}
+                  className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight"
+                >
+                  {personas[personaIndex].headline.split('for')[0]}
+                  <br />
+                  <span className={`bg-gradient-to-r ${personas[personaIndex].gradient} bg-clip-text text-transparent`}>
+                    for {personas[personaIndex].label.toLowerCase()}
+                  </span>
+                </motion.h1>
+              </AnimatePresence>
+              <AnimatePresence mode="wait">
+                <motion.p
+                  key={personaIndex + '-subtext'}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.45, ease: 'easeOut', delay: 0.08 }}
+                  className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed"
+                >
+                  {personas[personaIndex].subtext}
+                </motion.p>
+              </AnimatePresence>
+            </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button
                 size="lg"
