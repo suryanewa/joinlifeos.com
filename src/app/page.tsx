@@ -1034,8 +1034,10 @@ export default function Home() {
                   </svg>
                 </a>
                 <a href="https://www.instagram.com/joinlifeos/" className="text-muted-foreground hover:text-foreground transition-colors" aria-label="Instagram">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5zm4.25 2.25a6.25 6.25 0 1 1-6.25 6.25 6.25 6.25 0 0 1 6.25-6.25zm0 1.5a4.75 4.75 0 1 0 4.75 4.75A4.75 4.75 0 0 0 12 5.25zm6.5 1.25a1.25 1.25 0 1 1-1.25 1.25A1.25 1.25 0 0 1 18.5 6.5z"/>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                    <rect width="18" height="18" x="3" y="3" rx="5" stroke="currentColor" strokeWidth="1.5" />
+                    <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.5" />
+                    <circle cx="17" cy="7" r="1" fill="currentColor" />
                   </svg>
                 </a>
                 <a href="http://linkedin.com/company/joinlifeos" className="text-muted-foreground hover:text-foreground transition-colors" aria-label="LinkedIn">
