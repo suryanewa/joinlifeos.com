@@ -184,7 +184,7 @@ const HomePage = async () => {
 					<div className="relative h-[500px] w-full overflow-hidden rounded-lg border border-border">
 						<StarsBackground
 							className="absolute inset-0 z-0 h-full w-full"
-							disableScrollFade
+							disableScrollFade={true}
 						/>
 						<div className="pointer-events-none absolute inset-0 z-[5] bg-gradient-to-b from-black/40 to-black/60" />
 						<div className="absolute inset-0 z-10 flex items-center justify-center">

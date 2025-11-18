@@ -4,7 +4,7 @@ import { cn } from "@/utils";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 
-interface StarsBackgroundProps {
+export interface StarsBackgroundProps {
 	factor?: number;
 	speed?: number;
 	transition?: { stiffness?: number; damping?: number };
@@ -76,7 +76,7 @@ export function StarsBackground({
 	className,
 	children,
 	disableScrollFade = false,
-}: StarsBackgroundProps) {
+}: StarsBackgroundProps): JSX.Element {
 	const offsetX = useMotionValue(0);
 	const offsetY = useMotionValue(0);
 
