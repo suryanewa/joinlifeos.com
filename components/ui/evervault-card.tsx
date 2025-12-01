@@ -95,17 +95,27 @@ export const EvervaultCard = ({
 					// Base faint visibility
 					intensity = Math.max(intensity, 0.05);
 
+					// Reset shadow
+					ctx.shadowBlur = 0;
+					ctx.shadowColor = "transparent";
+
 					// Determine color based on intensity
 					if (intensity > 0.3) {
 						// Bright glow in the ripple
 						const randomChar = chars[Math.floor(Math.random() * chars.length)];
-						const whiteIntensity = Math.min(1, intensity * 1.5);
-						ctx.fillStyle = `rgba(255, 255, 255, ${whiteIntensity})`;
+						const alpha = Math.min(1, intensity * 1.5);
+						
+						// Add purple glow effect
+						ctx.shadowBlur = 8;
+						ctx.shadowColor = `rgba(168, 85, 247, ${alpha * 0.8})`; // Purple-500 glow
+						
+						// White center with purple tint
+						ctx.fillStyle = `rgba(230, 210, 255, ${alpha})`; 
 						ctx.fillText(randomChar, x, y);
 					} else {
 						// Faint background
 						const randomChar = chars[Math.floor(Math.random() * chars.length)];
-						ctx.fillStyle = `rgba(139, 92, 246, ${intensity})`; // Violet
+						ctx.fillStyle = `rgba(139, 92, 246, ${intensity * 0.5})`; // Violet, slightly dimmer base
 						ctx.fillText(randomChar, x, y);
 					}
 				}
