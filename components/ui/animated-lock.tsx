@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/utils";
 import { motion } from "motion/react";
 
 export const AnimatedLock = ({ className }: { className?: string }) => {
@@ -12,7 +13,7 @@ export const AnimatedLock = ({ className }: { className?: string }) => {
 			strokeWidth="2"
 			strokeLinecap="round"
 			strokeLinejoin="round"
-			className={className}
+			className={cn("overflow-visible", className)}
 		>
 			{/* Lock body - static */}
 			<rect x="5" y="11" width="14" height="10" rx="2" ry="2" />
