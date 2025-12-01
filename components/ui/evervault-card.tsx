@@ -86,7 +86,7 @@ export const EvervaultCard = ({
 					// Add pulsing wave effect
 					const distFromWave = Math.abs(dist - waveRadius);
 					if (distFromWave < waveWidth) {
-						const waveIntensity = Math.pow(1 - distFromWave / waveWidth, 2) * 0.3;
+						const waveIntensity = Math.pow(1 - distFromWave / waveWidth, 2) * 0.6; // Stronger wave
 						intensity += waveIntensity;
 					}
 
@@ -105,22 +105,23 @@ export const EvervaultCard = ({
 						ctx.shadowBlur = 0;
 						ctx.shadowColor = "transparent";
 
-						if (intensity > 0.6) {
+						// Threshold for "hot" glowing characters
+						if (intensity > 0.5) {
 							// Hot center / active wave part
-							const alpha = Math.min(1, (intensity - 0.6) * 2.5);
+							const alpha = Math.min(1, (intensity - 0.5) * 2); // Smoother transition
 							
-							// Purple glow
-							ctx.shadowBlur = 12;
+							// Intense Purple glow
+							ctx.shadowBlur = 20 + (alpha * 10); // Variable blur
 							ctx.shadowColor = `rgba(168, 85, 247, ${alpha})`; // Purple-500
 							
-							// White/Blueish text
-							ctx.fillStyle = `rgba(230, 230, 255, ${alpha})`;
+							// Bright White/Blueish text
+							ctx.fillStyle = `rgba(240, 240, 255, ${alpha})`;
 							ctx.fillText(randomChar, x, y);
 						} else {
 							// Faded background text
-							// Dark purple/blue
-							const alpha = intensity * 0.5;
-							ctx.fillStyle = `rgba(120, 100, 255, ${alpha})`;
+							// Brighter background for more visibility
+							const alpha = intensity * 0.8;
+							ctx.fillStyle = `rgba(147, 51, 234, ${alpha})`; // Purple-600
 							ctx.fillText(randomChar, x, y);
 						}
 					}
