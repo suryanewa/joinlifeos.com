@@ -19,11 +19,11 @@ export const EvervaultCard = ({
 		if (!ctx) return;
 
 		let animationFrameId: number;
-		let ripples: { radius: number; opacity: number }[] = [];
 		let frameCount = 0;
-
-		const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*()_+";
-		const fontSize = 14;
+		
+		const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+		const fontSize = 10;
+		const density = 1.2; // Adjust spacing
 
 		// Handle resize
 		const resize = () => {
@@ -47,76 +47,82 @@ export const EvervaultCard = ({
 
 			ctx.clearRect(0, 0, width, height);
 
-			// Spawn ripples periodically
-			if (frameCount % 120 === 0) { // Every ~2 seconds at 60fps
-				ripples.push({ radius: 0, opacity: 1 });
-			}
-
-			// Move and update ripples
-			for (let i = ripples.length - 1; i >= 0; i--) {
-				ripples[i].radius += 1; // Expansion speed
-				ripples[i].opacity -= 0.005; // Fade speed
-				if (ripples[i].opacity <= 0) {
-					ripples.splice(i, 1);
-				}
-			}
+			// Animation variables
+			const time = frameCount * 0.05;
+			
+			// Center glow pulse
+			const pulseScale = 1 + Math.sin(time * 0.5) * 0.1; 
+			
+			// Wave expansion
+			const waveRadius = (frameCount * 2) % (Math.max(width, height) * 0.8);
+			const waveWidth = 150;
 
 			ctx.font = `${fontSize}px monospace`;
 			ctx.textAlign = "center";
 			ctx.textBaseline = "middle";
 
-			const cols = Math.ceil(width / fontSize);
-			const rows = Math.ceil(height / fontSize);
+			const cols = Math.ceil(width / (fontSize * density));
+			const rows = Math.ceil(height / (fontSize * density));
 			const centerX = width / 2;
 			const centerY = height / 2;
 
 			for (let i = 0; i < cols; i++) {
 				for (let j = 0; j < rows; j++) {
-					const x = i * fontSize + fontSize / 2;
-					const y = j * fontSize + fontSize / 2;
+					const x = i * (fontSize * density) + (fontSize * density) / 2;
+					const y = j * (fontSize * density) + (fontSize * density) / 2;
 
-					// Calculate distance from center
+					// Distance from center
 					const dx = x - centerX;
 					const dy = y - centerY;
 					const dist = Math.sqrt(dx * dx + dy * dy);
 
-					let intensity = 0;
+					// Base nebula/glow shape (circular with falloff)
+					const maxDist = Math.min(width, height) * 0.6;
+					let intensity = Math.max(0, 1 - dist / maxDist);
+					
+					// Sharpen the falloff to create a "spotlight" effect
+					intensity = Math.pow(intensity, 3);
 
-					// Check interaction with ripples
-					for (const ripple of ripples) {
-						const distFromRipple = Math.abs(dist - ripple.radius);
-						const rippleWidth = 60;
-						if (distFromRipple < rippleWidth) {
-							const rippleIntensity = Math.pow(1 - distFromRipple / rippleWidth, 2) * ripple.opacity;
-							intensity = Math.max(intensity, rippleIntensity);
-						}
+					// Add pulsing wave effect
+					const distFromWave = Math.abs(dist - waveRadius);
+					if (distFromWave < waveWidth) {
+						const waveIntensity = Math.pow(1 - distFromWave / waveWidth, 2) * 0.3;
+						intensity += waveIntensity;
 					}
 
-					// Base faint visibility
-					intensity = Math.max(intensity, 0.05);
+					// Add subtle noise/twinkle
+					const noise = Math.sin(x * 0.1 + time) * Math.cos(y * 0.1 + time) * 0.2;
+					intensity += noise * intensity; // Only twinkle where visible
 
-					// Reset shadow
-					ctx.shadowBlur = 0;
-					ctx.shadowColor = "transparent";
+					// Clamp intensity
+					intensity = Math.max(0, Math.min(1, intensity));
 
-					// Determine color based on intensity
-					if (intensity > 0.3) {
-						// Bright glow in the ripple
-						const randomChar = chars[Math.floor(Math.random() * chars.length)];
-						const alpha = Math.min(1, intensity * 1.5);
+					// Only draw if visible enough
+					if (intensity > 0.01) {
+						const randomChar = chars[Math.floor(((x + y) * 0.1 + time) % chars.length)];
 						
-						// Add purple glow effect
-						ctx.shadowBlur = 8;
-						ctx.shadowColor = `rgba(168, 85, 247, ${alpha * 0.8})`; // Purple-500 glow
-						
-						// White center with purple tint
-						ctx.fillStyle = `rgba(230, 210, 255, ${alpha})`; 
-						ctx.fillText(randomChar, x, y);
-					} else {
-						// Faint background
-						const randomChar = chars[Math.floor(Math.random() * chars.length)];
-						ctx.fillStyle = `rgba(139, 92, 246, ${intensity * 0.5})`; // Violet, slightly dimmer base
-						ctx.fillText(randomChar, x, y);
+						// Reset shadow
+						ctx.shadowBlur = 0;
+						ctx.shadowColor = "transparent";
+
+						if (intensity > 0.6) {
+							// Hot center / active wave part
+							const alpha = Math.min(1, (intensity - 0.6) * 2.5);
+							
+							// Purple glow
+							ctx.shadowBlur = 12;
+							ctx.shadowColor = `rgba(168, 85, 247, ${alpha})`; // Purple-500
+							
+							// White/Blueish text
+							ctx.fillStyle = `rgba(230, 230, 255, ${alpha})`;
+							ctx.fillText(randomChar, x, y);
+						} else {
+							// Faded background text
+							// Dark purple/blue
+							const alpha = intensity * 0.5;
+							ctx.fillStyle = `rgba(120, 100, 255, ${alpha})`;
+							ctx.fillText(randomChar, x, y);
+						}
 					}
 				}
 			}
@@ -148,4 +154,3 @@ export const EvervaultCard = ({
 		</div>
 	);
 };
-
