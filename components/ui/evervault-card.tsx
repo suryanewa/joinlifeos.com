@@ -25,15 +25,20 @@ export const EvervaultCard = ({
 		const fontSize = 10;
 		const density = 1.2; // Adjust spacing
 
-		// Handle resize
+		// Handle resize - make canvas larger to allow ripple to extend beyond edges
+		const padding = 100; // Extra space for ripple extension
 		const resize = () => {
 			const parent = canvas.parentElement;
 			if (parent) {
 				const dpr = window.devicePixelRatio || 1;
-				canvas.width = parent.clientWidth * dpr;
-				canvas.height = parent.clientHeight * dpr;
-				canvas.style.width = `${parent.clientWidth}px`;
-				canvas.style.height = `${parent.clientHeight}px`;
+				const parentWidth = parent.clientWidth;
+				const parentHeight = parent.clientHeight;
+				canvas.width = (parentWidth + padding * 2) * dpr;
+				canvas.height = (parentHeight + padding * 2) * dpr;
+				canvas.style.width = `${parentWidth + padding * 2}px`;
+				canvas.style.height = `${parentHeight + padding * 2}px`;
+				canvas.style.marginLeft = `-${padding}px`;
+				canvas.style.marginTop = `-${padding}px`;
 				ctx.scale(dpr, dpr);
 			}
 		};
@@ -53,8 +58,9 @@ export const EvervaultCard = ({
 			// Center glow pulse
 			const pulseScale = 1 + Math.sin(time * 0.5) * 0.1; 
 			
-			// Wave expansion
-			const waveRadius = (frameCount * 2) % (Math.max(width, height) * 0.8);
+			// Wave expansion - allow it to extend fully
+			const maxDimension = Math.max(width, height);
+			const waveRadius = (frameCount * 2) % (maxDimension * 0.9);
 			const waveWidth = 150;
 
 			ctx.font = `${fontSize}px monospace`;
@@ -65,6 +71,9 @@ export const EvervaultCard = ({
 			const rows = Math.ceil(height / (fontSize * density));
 			const centerX = width / 2;
 			const centerY = height / 2;
+			
+			// Calculate fade-out distances from edges
+			const fadeDistance = 80; // Distance from edge to fade
 
 			for (let i = 0; i < cols; i++) {
 				for (let j = 0; j < rows; j++) {
@@ -76,12 +85,29 @@ export const EvervaultCard = ({
 					const dy = y - centerY;
 					const dist = Math.sqrt(dx * dx + dy * dy);
 
+					// Calculate distance from edges for fade-out
+					const distFromLeft = x;
+					const distFromRight = width - x;
+					const distFromTop = y;
+					const distFromBottom = height - y;
+					const minDistFromEdge = Math.min(distFromLeft, distFromRight, distFromTop, distFromBottom);
+					
+					// Edge fade multiplier (1.0 at center, 0.0 at edge)
+					let edgeFade = 1.0;
+					if (minDistFromEdge < fadeDistance) {
+						edgeFade = Math.max(0, minDistFromEdge / fadeDistance);
+						edgeFade = Math.pow(edgeFade, 2); // Smooth fade curve
+					}
+
 					// Base nebula/glow shape (circular with falloff)
 					const maxDist = Math.min(width, height) * 0.6;
 					let intensity = Math.max(0, 1 - dist / maxDist);
 					
 					// Sharpen the falloff to create a "spotlight" effect
 					intensity = Math.pow(intensity, 3);
+					
+					// Apply edge fade
+					intensity *= edgeFade;
 
 					// Add pulsing wave effect
 					const distFromWave = Math.abs(dist - waveRadius);
@@ -143,13 +169,13 @@ export const EvervaultCard = ({
 	return (
 		<div
 			className={cn(
-				"relative flex aspect-square h-full w-full items-center justify-center overflow-hidden bg-transparent",
+				"relative flex aspect-square h-full w-full items-center justify-center overflow-visible bg-transparent",
 				className,
 			)}
 		>
 			<canvas
 				ref={canvasRef}
-				className="absolute inset-0 h-full w-full"
+				className="absolute h-full w-full"
 			/>
 			<div className="relative z-10">{icon}</div>
 		</div>

@@ -287,7 +287,7 @@ const HomePage = async () => {
 						<h2 className="!leading-[1.1] mt-6 text-center font-heading font-medium text-3xl text-foreground md:text-5xl lg:text-center">
 							Encrypted & Protected
 						</h2>
-						<div className="mt-8 w-full overflow-hidden">
+						<div className="mt-8 w-full overflow-visible">
 							<EvervaultCard
 								icon={<AnimatedLock className="h-16 w-16" />}
 								className="h-80 w-full border-0"
