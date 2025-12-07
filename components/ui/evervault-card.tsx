@@ -19,26 +19,22 @@ export const EvervaultCard = ({
 		if (!ctx) return;
 
 		let animationFrameId: number;
-		let frameCount = 0;
+		let startTime = performance.now();
 		
 		const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
 		const fontSize = 10;
 		const density = 1.2; // Adjust spacing
+		const LOCK_CYCLE_DURATION = 4000; // 4 seconds in milliseconds - matches lock animation
 
-		// Handle resize - make canvas larger to allow ripple to extend beyond edges
-		const padding = 100; // Extra space for ripple extension
+		// Handle resize
 		const resize = () => {
 			const parent = canvas.parentElement;
 			if (parent) {
 				const dpr = window.devicePixelRatio || 1;
-				const parentWidth = parent.clientWidth;
-				const parentHeight = parent.clientHeight;
-				canvas.width = (parentWidth + padding * 2) * dpr;
-				canvas.height = (parentHeight + padding * 2) * dpr;
-				canvas.style.width = `${parentWidth + padding * 2}px`;
-				canvas.style.height = `${parentHeight + padding * 2}px`;
-				canvas.style.marginLeft = `-${padding}px`;
-				canvas.style.marginTop = `-${padding}px`;
+				canvas.width = parent.clientWidth * dpr;
+				canvas.height = parent.clientHeight * dpr;
+				canvas.style.width = `${parent.clientWidth}px`;
+				canvas.style.height = `${parent.clientHeight}px`;
 				ctx.scale(dpr, dpr);
 			}
 		};
@@ -52,15 +48,18 @@ export const EvervaultCard = ({
 
 			ctx.clearRect(0, 0, width, height);
 
-			// Animation variables
-			const time = frameCount * 0.05;
+			// Use time-based animation to sync with lock (4-second cycle)
+			const elapsed = (performance.now() - startTime) % LOCK_CYCLE_DURATION;
+			const cycleProgress = elapsed / LOCK_CYCLE_DURATION; // 0 to 1
+			const time = cycleProgress * Math.PI * 2; // Convert to radians for sin/cos
 			
 			// Center glow pulse
 			const pulseScale = 1 + Math.sin(time * 0.5) * 0.1; 
 			
-			// Wave expansion - allow it to extend fully
-			const maxDimension = Math.max(width, height);
-			const waveRadius = (frameCount * 2) % (maxDimension * 0.9);
+			// Wave expansion - synchronized with 4-second lock animation cycle
+			// Wave starts at center (0) when cycle starts (lock unlocks) and expands outward
+			const maxRadius = Math.max(width, height) * 0.8;
+			const waveRadius = cycleProgress * maxRadius; // 0 to maxRadius over 4 seconds
 			const waveWidth = 150;
 
 			ctx.font = `${fontSize}px monospace`;
@@ -71,9 +70,6 @@ export const EvervaultCard = ({
 			const rows = Math.ceil(height / (fontSize * density));
 			const centerX = width / 2;
 			const centerY = height / 2;
-			
-			// Calculate fade-out distances from edges
-			const fadeDistance = 80; // Distance from edge to fade
 
 			for (let i = 0; i < cols; i++) {
 				for (let j = 0; j < rows; j++) {
@@ -85,19 +81,21 @@ export const EvervaultCard = ({
 					const dy = y - centerY;
 					const dist = Math.sqrt(dx * dx + dy * dy);
 
-					// Calculate distance from edges for fade-out
+					// Calculate edge fade - distance from each edge
+					const edgeFadeDistance = Math.min(width, height) * 0.15; // Fade over 15% of smaller dimension
 					const distFromLeft = x;
 					const distFromRight = width - x;
 					const distFromTop = y;
 					const distFromBottom = height - y;
-					const minDistFromEdge = Math.min(distFromLeft, distFromRight, distFromTop, distFromBottom);
 					
-					// Edge fade multiplier (1.0 at center, 0.0 at edge)
-					let edgeFade = 1.0;
-					if (minDistFromEdge < fadeDistance) {
-						edgeFade = Math.max(0, minDistFromEdge / fadeDistance);
-						edgeFade = Math.pow(edgeFade, 2); // Smooth fade curve
-					}
+					// Calculate fade factor for each edge (1 = fully visible, 0 = fully faded)
+					const leftFade = Math.min(1, distFromLeft / edgeFadeDistance);
+					const rightFade = Math.min(1, distFromRight / edgeFadeDistance);
+					const topFade = Math.min(1, distFromTop / edgeFadeDistance);
+					const bottomFade = Math.min(1, distFromBottom / edgeFadeDistance);
+					
+					// Combine edge fades (use minimum to fade if near any edge)
+					const edgeFade = Math.min(leftFade, rightFade, topFade, bottomFade);
 
 					// Base nebula/glow shape (circular with falloff)
 					const maxDist = Math.min(width, height) * 0.6;
@@ -105,9 +103,6 @@ export const EvervaultCard = ({
 					
 					// Sharpen the falloff to create a "spotlight" effect
 					intensity = Math.pow(intensity, 3);
-					
-					// Apply edge fade
-					intensity *= edgeFade;
 
 					// Add pulsing wave effect
 					const distFromWave = Math.abs(dist - waveRadius);
@@ -117,15 +112,19 @@ export const EvervaultCard = ({
 					}
 
 					// Add subtle noise/twinkle
-					const noise = Math.sin(x * 0.1 + time) * Math.cos(y * 0.1 + time) * 0.2;
+					const noise = Math.sin(x * 0.1 + elapsed * 0.001) * Math.cos(y * 0.1 + elapsed * 0.001) * 0.2;
 					intensity += noise * intensity; // Only twinkle where visible
 
 					// Clamp intensity
 					intensity = Math.max(0, Math.min(1, intensity));
+					
+					// Apply edge fade to intensity
+					intensity *= edgeFade;
 
 					// Only draw if visible enough
 					if (intensity > 0.01) {
-						const randomChar = chars[Math.floor(((x + y) * 0.1 + time) % chars.length)];
+						// Random character that scrambles constantly
+						const randomChar = chars[Math.floor(Math.random() * chars.length)];
 						
 						// Reset shadow
 						ctx.shadowBlur = 0;
@@ -134,7 +133,7 @@ export const EvervaultCard = ({
 						// Threshold for "hot" glowing characters
 						if (intensity > 0.5) {
 							// Hot center / active wave part
-							const alpha = Math.min(1, (intensity - 0.5) * 2); // Smoother transition
+							const alpha = Math.min(1, (intensity - 0.5) * 2); // Edge fade already applied to intensity
 							
 							// Intense Purple glow
 							ctx.shadowBlur = 20 + (alpha * 10); // Variable blur
@@ -146,7 +145,7 @@ export const EvervaultCard = ({
 						} else {
 							// Faded background text
 							// Brighter background for more visibility
-							const alpha = intensity * 0.8;
+							const alpha = intensity * 0.8; // Edge fade already applied to intensity
 							ctx.fillStyle = `rgba(147, 51, 234, ${alpha})`; // Purple-600
 							ctx.fillText(randomChar, x, y);
 						}
@@ -154,7 +153,6 @@ export const EvervaultCard = ({
 				}
 			}
 
-			frameCount++;
 			animationFrameId = requestAnimationFrame(draw);
 		};
 
@@ -169,15 +167,30 @@ export const EvervaultCard = ({
 	return (
 		<div
 			className={cn(
-				"relative flex aspect-square h-full w-full items-center justify-center overflow-visible bg-transparent",
+				"relative flex aspect-square h-full w-full items-center justify-center overflow-hidden bg-transparent",
 				className,
 			)}
 		>
 			<canvas
 				ref={canvasRef}
-				className="absolute h-full w-full"
+				className="absolute inset-0 h-full w-full"
+				style={{
+					maskImage: "radial-gradient(ellipse 80% 80% at center, black 70%, transparent 100%)",
+					WebkitMaskImage: "radial-gradient(ellipse 80% 80% at center, black 70%, transparent 100%)",
+				}}
 			/>
-			<div className="relative z-10">{icon}</div>
+			<div className="absolute inset-0 z-10 flex items-center justify-center">
+				{/* Circle container with lock icon */}
+				<div
+					className="absolute flex size-32 items-center justify-center rounded-full border-2 border-violet-500/50 bg-background/95 p-6 shadow-2xl backdrop-blur-sm"
+					style={{
+						boxShadow:
+							"0 0 30px rgba(168, 85, 247, 0.8), 0 0 60px rgba(217, 70, 239, 0.6), 0 0 90px rgba(217, 70, 239, 0.4), inset 0 0 20px rgba(168, 85, 247, 0.3)",
+					}}
+				>
+					{icon}
+				</div>
+			</div>
 		</div>
 	);
 };

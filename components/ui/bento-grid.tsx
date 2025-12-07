@@ -33,7 +33,7 @@ export const CARDS = [
 		cta: "Learn more",
 		className: "col-span-3 lg:col-span-1",
 		background: (
-			<Card className="absolute top-10 left-10 origin-top rounded-none rounded-tl-md border border-border border-r-0 transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_0%,#000_100%)] group-hover:scale-105">
+			<Card className="absolute top-10 left-10 z-10 origin-top rounded-none rounded-tl-md border border-border border-r-0 bg-neutral-950 transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_0%,#000_100%)] group-hover:scale-105">
 				<CardHeader>
 					<CardTitle>Unified Inbox</CardTitle>
 					<CardDescription>
@@ -60,7 +60,7 @@ export const CARDS = [
 		cta: "Learn more",
 		className: "col-span-3 lg:col-span-2",
 		background: (
-			<Command className="group-hover:-translate-x-10 absolute top-10 right-10 w-[70%] origin-to translate-x-0 border border-border p-2 transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_40%,#000_100%)]">
+			<Command className="group-hover:-translate-x-10 absolute top-10 right-10 z-10 w-[70%] origin-to translate-x-0 border border-border bg-neutral-950 p-2 transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_40%,#000_100%)]">
 				<Input placeholder="What's on my plate today?" />
 				<div className="mt-1 cursor-pointer">
 					<div className="rounded-md px-4 py-2 hover:bg-muted">
@@ -109,7 +109,7 @@ export const CARDS = [
 			<Calendar
 				mode="single"
 				selected={new Date(2022, 4, 11, 0, 0, 0)}
-				className="absolute top-10 right-0 origin-top rounded-md border border-border transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_40%,#000_100%)] group-hover:scale-105"
+				className="absolute top-10 right-0 z-10 origin-top rounded-md border border-border bg-neutral-950 transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_40%,#000_100%)] group-hover:scale-105"
 			/>
 		),
 	},
